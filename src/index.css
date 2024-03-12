@@ -1,0 +1,9 @@
+body {
+  font-family: 'Mina', sans-serif;
+}
+
+#root {
+  display: flex;
+  justify-content: start;
+  margin-top: 50px;
+}
