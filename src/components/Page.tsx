@@ -1,53 +1,72 @@
 import { useState, useEffect } from "react";
-import Form from "./Form";
-const _URL = "http://localhost:7070/";
+import Form from "./Form/Form";
+import Profile from "./Profile/Profile";
+import Newsline from "./Newsline/Newsline";
+import { ProfileType, NewslineType, authorize, fetchProfile, fetchNewsline, logOut } from "./service";
 
 const Page = () => {
 
   const [token, setToken] = useState<string>("");
-  const [profile, setProfile] = useState();
-  
-  const authorize = async (data: {login: string, password: string}) => {
-    const r = await fetch(_URL + "auth", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
-    const response = await r.json();
-    setToken(response.token);
-  }
+  const [profile, setProfile] = useState<ProfileType>();
+  const [newsline, setNewsline] = useState<NewslineType>([]);
 
-  const handlerSubmit = (event: any) => {
+  const handleSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
-    const { target } = event;
-    const userName = target.elements.userName.value;
-    const password = target.elements.password.value;
+    const target = event.target as HTMLFormElement;
+    const formData = new FormData(target);
+    const data = Object.fromEntries(formData);
+    const userName = data.userName as string;
+    const password = data.password as string;
     target.reset();
-    authorize({ login: userName, password })
-  }
-
-  const requestProfile = async () => {
-    const r = await fetch(_URL + "private/me", {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,  
-      }
+    authorize({ login: userName, password }).then(res => {
+      setToken(res);
     });
-
   }
-
-
 
   useEffect(() => {
-    requestProfile();
+    const JSONtoken = localStorage.getItem("auth_token");
+    if (!JSONtoken) {
+      return;
+    }
+    setToken(JSON.parse(JSONtoken));
+    const JSONprofile = localStorage.getItem("auth_profile");
+    if (!JSONprofile) {
+      return;
+    }
+    setProfile(JSON.parse(JSONprofile));
+  }, []);
+
+  useEffect(() => {
+    if (token && !localStorage.getItem("auth_token")) {
+      fetchProfile(token).then(res => {
+        setProfile(res);
+      });
+      localStorage.setItem("auth_token", JSON.stringify(token));
+    }
   }, [token]);
 
+  useEffect(() => {
+    if (profile) {
+      fetchNewsline(token).then(res => {
+        setNewsline(res);
+      });
+      localStorage.setItem("auth_profile", JSON.stringify(profile));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile]);
+
+  const handleClick: React.MouseEventHandler<HTMLButtonElement> = () => {
+    setNewsline([]);
+    setProfile(undefined);
+    setToken("");
+    logOut();
+  }
+
   return (
-    <div>
-      <Form handlerSubmit={handlerSubmit} />
-      <div>{token}</div>
+    <div className="page">
+      {!profile && <Form handleSubmit={handleSubmit} />}
+      {profile && <Profile profile={profile} handleClick={handleClick} />}
+      {newsline && <Newsline newsline={newsline} />}
     </div>
   )
 }

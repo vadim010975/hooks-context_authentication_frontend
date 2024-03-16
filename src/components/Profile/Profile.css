@@ -1,0 +1,29 @@
+.profile {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  background-color: #f8f9fa;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.profile__title {
+  font-weight: 400;
+  flex-grow: 1;
+}
+
+.profile__img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.profile__btn {
+  padding: 10px;
+  background-color: #f8f9fa;
+  border: 1px solid #da3b4a;
+  border-radius: 5px;
+  color: #da3b4a;
+  cursor: pointer;
+}
