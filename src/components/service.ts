@@ -14,25 +14,35 @@ export type NewslineType = {
   content: string;
 }[];
 
-export const authorize = async (data: { login: string, password: string }) => {
-  const r = await fetch(_URL + "auth", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
-  const response = await r.json();
-  return response.token;
-}
+export const authorize = async (data: { login: string; password: string }) => {
+  try {
+    const r = await fetch(_URL + "auth", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    if (r.status < 200 || r.status > 299) {
+      throw new Error(r.statusText);
+    }
+    if (r.status === 401) {
+      logOut();
+    }
+    const response = await r.json();
+    return response.token;
+  } catch (e) {
+    console.log(e);
+  }
+};
 
 export const fetchProfile = async (token: string) => {
   try {
     const r = await fetch(_URL + "private/me", {
-      method: 'GET',
+      method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
-      }
+      },
     });
     if (r.status < 200 || r.status > 299) {
       throw new Error(r.statusText);
@@ -45,20 +55,30 @@ export const fetchProfile = async (token: string) => {
   } catch (e) {
     console.log(e);
   }
-}
+};
 
 export const fetchNewsline = async (token: string) => {
-  const r = await fetch(_URL + "private/news", {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${token}`,
+  try {
+    const r = await fetch(_URL + "private/news", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (r.status < 200 || r.status > 299) {
+      throw new Error(r.statusText);
     }
-  });
-  const response = await r.json();
-  return response;
-}
+    if (r.status === 401) {
+      logOut();
+    }
+    const response = await r.json();
+    return response;
+  } catch (e) {
+    console.log(e);
+  }
+};
 
 export const logOut = () => {
   localStorage.removeItem("auth_token");
   localStorage.removeItem("auth_profile");
-}
+};
