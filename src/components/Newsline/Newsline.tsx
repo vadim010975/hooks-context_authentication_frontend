@@ -1,18 +1,11 @@
-import { FC } from "react";
+import { useContext } from "react";
 import "./Newsline.css"
+import { NewslineType } from "../service";
+import NewslineContext from "../../contexts/NewsLineContext";
 
-type NewslineType = {
-  id: string,
-  title: string,
-  image: string,
-  content: string,
-}[];
+const Newsline = () => {
 
-type NewslineProps = {
-  newsline: NewslineType,
-}
-
-const Newsline: FC<NewslineProps> = ({ newsline }) => {
+  const newsline = useContext(NewslineContext) as NewslineType;
 
   return (
     <section className="newsline">

@@ -24,15 +24,13 @@ export const authorize = async (data: { login: string; password: string }) => {
       body: JSON.stringify(data),
     });
     if (r.status < 200 || r.status > 299) {
-      throw new Error(r.statusText);
-    }
-    if (r.status === 401) {
-      logOut();
+      throw new Error(r.status.toString());
     }
     const response = await r.json();
-    return response.token;
+    return {token: response.token};
   } catch (e) {
-    console.log(e);
+    const error = e as Error;
+    return {error};
   }
 };
 
@@ -45,15 +43,13 @@ export const fetchProfile = async (token: string) => {
       },
     });
     if (r.status < 200 || r.status > 299) {
-      throw new Error(r.statusText);
-    }
-    if (r.status === 401) {
-      logOut();
+      throw new Error(r.status.toString());
     }
     const response = await r.json();
-    return response;
+    return {response};
   } catch (e) {
-    console.log(e);
+    const error = e as Error;
+    return {error};
   }
 };
 
@@ -66,15 +62,13 @@ export const fetchNewsline = async (token: string) => {
       },
     });
     if (r.status < 200 || r.status > 299) {
-      throw new Error(r.statusText);
-    }
-    if (r.status === 401) {
-      logOut();
+      throw new Error(r.status.toString());
     }
     const response = await r.json();
-    return response;
+    return {response};
   } catch (e) {
-    console.log(e);
+    const error = e as Error;
+    return {error};
   }
 };
 
