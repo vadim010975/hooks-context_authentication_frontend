@@ -1,0 +1,55 @@
+import React, {useEffect, useState} from "react";
+
+export const AuthContext = React.createContext({
+isLoggedIn: false,
+user: {},
+news: {},
+error: '',
+login: (credentials) => {},
+logout: () => {}
+});
+
+const AuthContextProvider = (props) => {
+const [isLoggedIn, setIsLoggedIn] = useState(false);
+const [user, setUser] = useState({});
+const [news, setNews] = useState([]);
+const [error, setError] = useState('');
+const [showTooltip, setShowTooltip] = useState(false);
+
+useEffect(() => {
+const data = JSON.parse(localStorage.getItem('user'));
+if (data && data.isLoggedIn) {
+setIsLoggedIn(true);
+}
+}, [])
+
+useEffect(() => {
+if (error) {
+localStorage.removeItem('user');
+return;
+}
+if (isLoggedIn) {
+const sendRequest = async () => {}
+sendRequest();
+}
+}, [isLoggedIn])
+const onLoginHandler = (credentials) => {}
+const onLogoutHandler = () => {}
+const getNews = () => {}
+
+return (
+<AuthContext.Provider value={{
+isLoggedIn,
+news,
+error,
+user,
+login: onLoginHandler,
+logout: onLogoutHandler,
+getNews
+}}>
+{props.children}
+</AuthContext.Provider>
+)
+}
+
+export default AuthContextProvider;
